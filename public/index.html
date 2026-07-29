@@ -9,7 +9,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <style>
-        /* ===== STILI (STESSI DI PRIMA) ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
             --primary: #8b5cf6;
@@ -61,7 +60,6 @@
 
         .glass { background: var(--bg-card); backdrop-filter: blur(20px) saturate(1.3); border: 1px solid var(--border-glass); }
 
-        /* NAV */
         .top-nav {
             display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
             padding: 0.5rem 1rem 0.5rem 1.8rem; border-radius: 60px; margin-bottom: 2.5rem;
@@ -192,7 +190,6 @@
         .buy-btn-card:active { transform: scale(0.96); }
         .buy-btn-card:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
         .buy-btn-card.owned { background: linear-gradient(135deg, #34d399, #10b981); }
-        .buy-btn-card.owned:hover { box-shadow: 0 8px 32px rgba(52, 211, 153, 0.3); }
 
         .disclaimer-global {
             background: rgba(139, 92, 246, 0.03); border: 1px solid rgba(139, 92, 246, 0.06);
@@ -305,7 +302,6 @@
         .btn-link-roblox:hover { transform: scale(1.03); }
         .roblox-status { margin-top: 0.5rem; font-size: 0.8rem; color: var(--text-muted); }
 
-        /* MODALE DETTAGLI CUSTOM */
         .modal-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(20px);
@@ -513,7 +509,6 @@
                 </div>
 
                 <div class="product-grid" id="productGrid">
-                    <!-- WEAPONS (SINGOLI - NON RIACQUISTABILI) -->
                     <div class="product-card animate-in" data-category="weapons" data-single="true">
                         <div class="product-icon"><i class="fas fa-gun"></i></div>
                         <div class="product-name">Tec-9</div>
@@ -536,7 +531,6 @@
                         <button class="buy-btn-card" data-pass="Walther PPK" data-price="10" data-single="true">Acquista</button>
                     </div>
 
-                    <!-- TURF -->
                     <div class="product-card animate-in" data-category="turf">
                         <div class="product-icon"><i class="fas fa-shield-alt"></i></div>
                         <div class="product-name">Turf Shield</div>
@@ -545,7 +539,6 @@
                         <button class="buy-btn-card" data-pass="Turf Shield" data-price="30">Acquista</button>
                     </div>
 
-                    <!-- COSMETICS - SINGOLO -->
                     <div class="product-card animate-in" data-category="cosmetics" data-single="true">
                         <div class="product-icon"><i class="fas fa-user-astronaut"></i></div>
                         <div class="product-name">Custom Avatar</div>
@@ -554,7 +547,6 @@
                         <button class="buy-btn-card" data-pass="Custom Avatar" data-price="50" data-single="true">Acquista</button>
                     </div>
 
-                    <!-- COSMETICS - CUSTOM (CON DETTAGLI) -->
                     <div class="product-card animate-in" data-category="cosmetics" data-custom="true">
                         <div class="product-icon"><i class="fas fa-level-up-alt"></i></div>
                         <div class="product-name">Custom Level</div>
@@ -741,9 +733,7 @@
                         document.getElementById('navOwnerOrders').style.display = 'inline-block';
                     }
 
-                    // Controlla gli acquisti singoli
                     checkSinglePurchases();
-
                     loadUserOrders();
                     if (isOwner) { loadOwnerOrders(); loadUsersList(); }
 
@@ -812,7 +802,6 @@
                 showToast('❌ Inserisci i dettagli richiesti', 'error');
                 return;
             }
-
             const { passName, price } = pendingOrder;
             await processOrder(passName, price, { details: customValue });
             closeCustomModal();
@@ -835,7 +824,6 @@
                     document.getElementById('creditsDisplay').textContent = data.newCredits;
                     document.getElementById('profileCredits').textContent = data.newCredits;
                     
-                    // Aggiorna la lista acquisti singoli
                     if (data.order && ['Tec-9', 'Glock 17 Switch', 'Walther PPK', 'Custom Avatar'].includes(passName)) {
                         if (currentUser) {
                             if (!currentUser.purchasedItems) currentUser.purchasedItems = [];
@@ -861,21 +849,17 @@
         document.querySelectorAll('.buy-btn-card').forEach(btn => {
             btn.addEventListener('click', function(e) {
                 e.preventDefault();
-                
                 if (this.disabled) return;
 
                 const passName = this.getAttribute('data-pass');
                 const price = parseInt(this.getAttribute('data-price'));
                 const isCustom = this.getAttribute('data-custom') === 'true';
-                const isSingle = this.getAttribute('data-single') === 'true';
 
-                // Se è custom, apri il modale
                 if (isCustom) {
                     openCustomModal(passName, price);
                     return;
                 }
 
-                // Altrimenti acquisto diretto
                 if (!confirm(`🛒 Acquistare ${passName} (${price} credits)?`)) return;
                 processOrder(passName, price);
             });
@@ -1124,7 +1108,18 @@
         }
 
         // ===== AVVIA =====
-        checkAuth();
+        // Forza il controllo dell'autenticazione all'avvio
+        document.addEventListener('DOMContentLoaded', function() {
+            // Se c'è auth=success nell'URL, rimuovilo per pulizia
+            if (window.location.search.includes('auth=success')) {
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+            // Avvia il check
+            checkAuth();
+        });
+
+        // Controllo aggiuntivo dopo 1 secondo (per sicurezza)
+        setTimeout(checkAuth, 1000);
     </script>
 </body>
 </html>
