@@ -22,14 +22,13 @@ const PORT = process.env.PORT || 3000;
 // CONFIGURAZIONE
 const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID;
 const DISCORD_CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET;
-const DISCORD_REDIRECT_URI = process.env.APP_URL ? 
-    `${process.env.APP_URL}/auth/discord/callback` : 
-    'http://localhost:3000/auth/discord/callback';
+// 🔥 MODIFICATO: URL FISSO DEL TUO SITO
+const DISCORD_REDIRECT_URI = 'https://shop3-tjty.onrender.com/auth/discord/callback';
 const SESSION_SECRET = process.env.SESSION_SECRET || 'una_chiave_super_sicura';
 
 // Middleware
 app.use(cors({
-    origin: [process.env.APP_URL || 'http://localhost:3000'],
+    origin: [process.env.APP_URL || 'https://shop3-tjty.onrender.com'],
     credentials: true
 }));
 app.use(express.json());
@@ -138,7 +137,7 @@ app.get('/auth/discord/callback', async (req, res) => {
                 email: userData.email,
                 credits: 0,
                 robloxUsername: null,
-                purchasedItems: [], // Per tenere traccia degli acquisti singoli
+                purchasedItems: [],
                 joinedAt: new Date().toISOString()
             };
             saveData(data);
@@ -275,7 +274,6 @@ app.post('/api/roblox/link', (req, res) => {
 
 // ===== ROTTE ORDINI =====
 
-// Controlla se un item è già stato acquistato (singolo)
 app.get('/api/check-purchased/:itemName', (req, res) => {
     if (!req.session.user) {
         return res.status(401).json({ error: 'Non autenticato' });
@@ -303,7 +301,6 @@ app.post('/api/orders', (req, res) => {
     const data = getData();
     const user = data.users[req.session.user.id];
     
-    // Verifica se è un acquisto singolo (non riacquistabile)
     const singlePurchaseItems = ['Tec-9', 'Glock 17 Switch', 'Walther PPK', 'Custom Avatar'];
     if (singlePurchaseItems.includes(passName)) {
         if (user?.purchasedItems?.includes(passName)) {
@@ -314,16 +311,13 @@ app.post('/api/orders', (req, res) => {
         }
     }
 
-    // Controlla crediti
     const userCredits = user?.credits || 0;
     if (userCredits < parseInt(price)) {
         return res.status(400).json({ error: 'Crediti insufficienti' });
     }
 
-    // Sottrai i crediti
     user.credits = userCredits - parseInt(price);
     
-    // Se è un acquisto singolo, salva nella lista
     if (singlePurchaseItems.includes(passName)) {
         if (!user.purchasedItems) user.purchasedItems = [];
         user.purchasedItems.push(passName);
@@ -341,14 +335,12 @@ app.post('/api/orders', (req, res) => {
         createdAt: new Date().toISOString(),
         completedAt: null,
         robloxUsername: user?.robloxUsername || null,
-        // Dettagli personalizzati per Custom Level, Name, Emoji
         customDetails: customDetails || null
     };
 
     data.orders.push(newOrder);
     saveData(data);
 
-    // Aggiorna la sessione
     req.session.user.credits = user.credits;
     req.session.user.purchasedItems = user.purchasedItems || [];
 
