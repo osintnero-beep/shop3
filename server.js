@@ -1,9 +1,11 @@
-const express = require('express');
+ const express = require('express');
 const axios = require('axios');
 const session = require('express-session');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
+const RedisStore = require('connect-redis')(session);
+const { createClient } = require('redis');
 
 // Carica .env
 const envPath = path.join(__dirname, '.env');
@@ -14,16 +16,11 @@ if (fs.existsSync(envPath)) {
 console.log('=== VARIABILI .env ===');
 console.log('DISCORD_CLIENT_ID:', process.env.DISCORD_CLIENT_ID || '❌ NON TROVATO');
 console.log('DISCORD_CLIENT_SECRET:', process.env.DISCORD_CLIENT_SECRET ? '✅ TROVATO' : '❌ NON TROVATO');
+console.log('REDIS_URL:', process.env.REDIS_URL ? '✅ TROVATO' : '❌ NON TROVATO');
 console.log('======================');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-
-// 🔥 DEBUG: Log di tutte le richieste
-app.use((req, res, next) => {
-    console.log('📨 Richiesta:', req.method, req.url);
-    next();
-});
 
 // CONFIGURAZIONE
 const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID;
@@ -39,18 +36,56 @@ app.use(cors({
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ===== SESSIONI - FIX PER RENDER (SENZA DOMAIN) =====
-app.use(session({
-    secret: SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-        httpOnly: true,
-        secure: true, // HTTPS obbligatorio su Render
-        sameSite: 'none', // Permette cross-site
-        maxAge: 1000 * 60 * 60 * 24 // 24 ore
-    }
-}));
+// ===== REDIS PER LE SESSIONI =====
+let redisClient = null;
+let sessionMiddleware = null;
+
+try {
+    redisClient = createClient({
+        url: process.env.REDIS_URL || 'redis://localhost:6379'
+    });
+    
+    redisClient.on('error', (err) => console.error('❌ Redis error:', err));
+    redisClient.on('connect', () => console.log('✅ Redis connesso!'));
+    
+    // Connetti Redis
+    (async () => {
+        await redisClient.connect();
+        console.log('✅ Redis connesso con successo!');
+    })();
+    
+    sessionMiddleware = session({
+        store: new RedisStore({ client: redisClient }),
+        secret: SESSION_SECRET,
+        resave: false,
+        saveUninitialized: false,
+        cookie: {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'none',
+            maxAge: 1000 * 60 * 60 * 24
+        }
+    });
+    
+    console.log('✅ Redis configurato per le sessioni');
+} catch (error) {
+    console.error('❌ Errore Redis:', error.message);
+    console.log('⚠️ Uso MemoryStore come fallback');
+    
+    sessionMiddleware = session({
+        secret: SESSION_SECRET,
+        resave: false,
+        saveUninitialized: false,
+        cookie: {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'none',
+            maxAge: 1000 * 60 * 60 * 24
+        }
+    });
+}
+
+app.use(sessionMiddleware);
 
 // ===== FILE PER I DATI =====
 const DATA_FILE = path.join(__dirname, 'data.json');
@@ -61,11 +96,7 @@ function getData() {
             const data = fs.readFileSync(DATA_FILE, 'utf8');
             return JSON.parse(data);
         }
-        return { 
-            users: {}, 
-            orders: [],
-            creditTransactions: []
-        };
+        return { users: {}, orders: [], creditTransactions: [] };
     } catch (error) {
         console.error('Errore lettura dati:', error);
         return { users: {}, orders: [], creditTransactions: [] };
@@ -154,7 +185,6 @@ app.get('/auth/discord/callback', async (req, res) => {
             console.log('✅ Nuovo utente creato:', userData.username);
         }
 
-        // Salva l'utente nella sessione
         req.session.user = {
             id: userData.id,
             username: userData.username,
@@ -168,7 +198,6 @@ app.get('/auth/discord/callback', async (req, res) => {
             purchasedItems: data.users[userData.id]?.purchasedItems || []
         };
 
-        // Salva esplicitamente la sessione prima del redirect
         req.session.save((err) => {
             if (err) {
                 console.error('❌ Errore salvataggio sessione:', err);
@@ -179,7 +208,6 @@ app.get('/auth/discord/callback', async (req, res) => {
             console.log(`👑 È owner? ${req.session.user.isOwner ? 'SÌ' : 'NO'}`);
             console.log(`🔄 Reindirizzamento a: https://shop3-tjty.onrender.com`);
             
-            // 🔥 FIX: Reindirizzamento diretto all'URL del sito
             res.redirect('https://shop3-tjty.onrender.com');
         });
 
@@ -192,9 +220,8 @@ app.get('/auth/discord/callback', async (req, res) => {
 // ===== ROTTE API =====
 
 app.get('/api/user', (req, res) => {
-    console.log('📨 /api/user chiamata, sessione:', req.session.user ? '✅ presente' : '❌ assente');
-    console.log('🔍 Sessione ID:', req.session.id);
-    if (req.session.user) {
+    console.log('📨 /api/user chiamata, sessione:', req.session?.user ? '✅ presente' : '❌ assente');
+    if (req.session?.user) {
         res.json({ user: req.session.user });
     } else {
         res.json({ user: null });
@@ -213,7 +240,7 @@ app.get('/api/logout', (req, res) => {
 // ===== ROTTE CREDITI =====
 
 app.post('/api/credits/add', (req, res) => {
-    if (!req.session.user || !req.session.user.isOwner) {
+    if (!req.session?.user || !req.session.user.isOwner) {
         return res.status(403).json({ error: 'Accesso negato' });
     }
 
@@ -256,7 +283,7 @@ app.post('/api/credits/add', (req, res) => {
 });
 
 app.get('/api/users', (req, res) => {
-    if (!req.session.user || !req.session.user.isOwner) {
+    if (!req.session?.user || !req.session.user.isOwner) {
         return res.status(403).json({ error: 'Accesso negato' });
     }
 
@@ -277,7 +304,7 @@ app.get('/api/users', (req, res) => {
 // ===== ROTTE ROBLOX =====
 
 app.post('/api/roblox/link', (req, res) => {
-    if (!req.session.user) {
+    if (!req.session?.user) {
         return res.status(401).json({ error: 'Non autenticato' });
     }
 
@@ -299,7 +326,7 @@ app.post('/api/roblox/link', (req, res) => {
 // ===== ROTTE ORDINI =====
 
 app.get('/api/check-purchased/:itemName', (req, res) => {
-    if (!req.session.user) {
+    if (!req.session?.user) {
         return res.status(401).json({ error: 'Non autenticato' });
     }
 
@@ -312,7 +339,7 @@ app.get('/api/check-purchased/:itemName', (req, res) => {
 });
 
 app.post('/api/orders', (req, res) => {
-    if (!req.session.user) {
+    if (!req.session?.user) {
         return res.status(401).json({ error: 'Non autenticato' });
     }
 
@@ -377,7 +404,7 @@ app.post('/api/orders', (req, res) => {
 });
 
 app.get('/api/orders/my', (req, res) => {
-    if (!req.session.user) {
+    if (!req.session?.user) {
         return res.status(401).json({ error: 'Non autenticato' });
     }
 
@@ -387,7 +414,7 @@ app.get('/api/orders/my', (req, res) => {
 });
 
 app.get('/api/orders/all', (req, res) => {
-    if (!req.session.user || !req.session.user.isOwner) {
+    if (!req.session?.user || !req.session.user.isOwner) {
         return res.status(403).json({ error: 'Accesso negato' });
     }
 
@@ -396,7 +423,7 @@ app.get('/api/orders/all', (req, res) => {
 });
 
 app.post('/api/orders/:id/accept', (req, res) => {
-    if (!req.session.user || !req.session.user.isOwner) {
+    if (!req.session?.user || !req.session.user.isOwner) {
         return res.status(403).json({ error: 'Accesso negato' });
     }
 
