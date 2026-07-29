@@ -39,16 +39,17 @@ app.use(cors({
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Sessioni
+// ===== SESSIONI - FIX PER RENDER =====
 app.use(session({
     secret: SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 1000 * 60 * 60 * 24
+        secure: true, // HTTPS obbligatorio su Render
+        sameSite: 'none', // Permette cross-site
+        domain: '.onrender.com', // Dominio valido per Render
+        maxAge: 1000 * 60 * 60 * 24 // 24 ore
     }
 }));
 
@@ -154,6 +155,7 @@ app.get('/auth/discord/callback', async (req, res) => {
             console.log('✅ Nuovo utente creato:', userData.username);
         }
 
+        // Salva l'utente nella sessione
         req.session.user = {
             id: userData.id,
             username: userData.username,
@@ -167,12 +169,20 @@ app.get('/auth/discord/callback', async (req, res) => {
             purchasedItems: data.users[userData.id]?.purchasedItems || []
         };
 
-        console.log(`✅ Utente loggato: ${userData.username} (ID: ${userData.id})`);
-        console.log(`👑 È owner? ${req.session.user.isOwner ? 'SÌ' : 'NO'}`);
-        console.log(`🔄 Reindirizzamento a: https://shop3-tjty.onrender.com`);
-
-        // 🔥 FIX: Reindirizzamento diretto all'URL del sito
-        res.redirect('https://shop3-tjty.onrender.com');
+        // Salva esplicitamente la sessione prima del redirect
+        req.session.save((err) => {
+            if (err) {
+                console.error('❌ Errore salvataggio sessione:', err);
+                return res.redirect('/?auth=error');
+            }
+            
+            console.log(`✅ Utente loggato: ${userData.username} (ID: ${userData.id})`);
+            console.log(`👑 È owner? ${req.session.user.isOwner ? 'SÌ' : 'NO'}`);
+            console.log(`🔄 Reindirizzamento a: https://shop3-tjty.onrender.com`);
+            
+            // 🔥 FIX: Reindirizzamento diretto all'URL del sito
+            res.redirect('https://shop3-tjty.onrender.com');
+        });
 
     } catch (error) {
         console.error('❌ Errore autenticazione:', error.response?.data || error.message);
@@ -184,6 +194,7 @@ app.get('/auth/discord/callback', async (req, res) => {
 
 app.get('/api/user', (req, res) => {
     console.log('📨 /api/user chiamata, sessione:', req.session.user ? '✅ presente' : '❌ assente');
+    console.log('🔍 Sessione ID:', req.session.id);
     if (req.session.user) {
         res.json({ user: req.session.user });
     } else {
