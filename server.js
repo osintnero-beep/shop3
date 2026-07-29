@@ -33,13 +33,13 @@ const SESSION_SECRET = process.env.SESSION_SECRET || 'una_chiave_super_sicura';
 
 // Middleware
 app.use(cors({
-    origin: [process.env.APP_URL || 'https://shop3-tjty.onrender.com'],
+    origin: ['https://shop3-tjty.onrender.com', 'http://localhost:3000'],
     credentials: true
 }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ===== SESSIONI - FIX PER RENDER =====
+// ===== SESSIONI - FIX PER RENDER (SENZA DOMAIN) =====
 app.use(session({
     secret: SESSION_SECRET,
     resave: false,
@@ -48,7 +48,6 @@ app.use(session({
         httpOnly: true,
         secure: true, // HTTPS obbligatorio su Render
         sameSite: 'none', // Permette cross-site
-        domain: '.onrender.com', // Dominio valido per Render
         maxAge: 1000 * 60 * 60 * 24 // 24 ore
     }
 }));
