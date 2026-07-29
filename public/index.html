@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Streetz War · Pass Shop</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+        /* ===== STILI (STESSI DI PRIMA) ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #8b5cf6;
+            --primary-light: #a78bfa;
+            --primary-dark: #7c3aed;
+            --bg-dark: #0a0618;
+            --bg-card: rgba(20, 12, 48, 0.85);
+            --text-primary: #f0edff;
+            --text-secondary: #b8b0d9;
+            --text-muted: #7a72a3;
+            --border-glass: rgba(139, 92, 246, 0.12);
+            --radius: 28px;
+            --radius-sm: 16px;
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        body {
+            background: var(--bg-dark);
+            font-family: 'Inter', sans-serif;
+            color: var(--text-primary);
+            min-height: 100vh;
+            background-image: radial-gradient(ellipse at 20% 30%, rgba(139, 92, 246, 0.08) 0%, transparent 60%),
+                              radial-gradient(ellipse at 80% 70%, rgba(192, 132, 252, 0.05) 0%, transparent 50%);
+            background-attachment: fixed;
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-dark); }
+        ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
+        .app { max-width: 1200px; margin: 0 auto; padding: 1.5rem 2rem 2rem; }
+        .font-lilita { font-family: 'Lilita One', cursive; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .animate-in { animation: fadeUp 0.6s ease forwards; opacity: 0; }
+        .animate-in:nth-child(1) { animation-delay: 0.05s; }
+        .animate-in:nth-child(2) { animation-delay: 0.1s; }
+        .animate-in:nth-child(3) { animation-delay: 0.15s; }
+        .animate-in:nth-child(4) { animation-delay: 0.2s; }
+        .animate-in:nth-child(5) { animation-delay: 0.25s; }
+        .animate-in:nth-child(6) { animation-delay: 0.3s; }
+        .animate-in:nth-child(7) { animation-delay: 0.35s; }
+        .animate-in:nth-child(8) { animation-delay: 0.4s; }
+
+        .glass { background: var(--bg-card); backdrop-filter: blur(20px) saturate(1.3); border: 1px solid var(--border-glass); }
+
+        /* NAV */
+        .top-nav {
+            display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+            padding: 0.5rem 1rem 0.5rem 1.8rem; border-radius: 60px; margin-bottom: 2.5rem;
+            background: rgba(10, 6, 24, 0.85); backdrop-filter: blur(24px) saturate(1.4);
+            border: 1px solid rgba(139, 92, 246, 0.08); box-shadow: 0 4px 40px rgba(0, 0, 0, 0.6);
+            transition: var(--transition);
+        }
+        .top-nav:hover { border-color: rgba(139, 92, 246, 0.15); }
+        .nav-left { display: flex; align-items: center; gap: 2.5rem; }
+        .brand {
+            font-family: 'Lilita One', cursive; font-size: 1.6rem;
+            background: linear-gradient(135deg, #a78bfa, #8b5cf6, #c084fc);
+            background-size: 200% 200%; -webkit-background-clip: text; background-clip: text; color: transparent;
+            cursor: pointer; display: flex; align-items: center; gap: 10px;
+            transition: var(--transition); animation: gradientMove 4s ease infinite;
+        }
+        .brand:hover { transform: scale(1.03); }
+        .brand i { color: var(--primary-light); font-size: 1.4rem; }
+        .nav-links { display: flex; gap: 0.3rem; font-weight: 600; font-size: 0.85rem; }
+        .nav-links span {
+            cursor: pointer; padding: 0.5rem 1.2rem; border-radius: 40px;
+            transition: var(--transition); color: var(--text-secondary); font-weight: 500;
+        }
+        .nav-links span:hover { color: var(--text-primary); background: rgba(139, 92, 246, 0.08); }
+        .nav-links span.active {
+            color: #fff; background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            font-weight: 600; box-shadow: 0 4px 20px rgba(139, 92, 246, 0.3);
+        }
+        .nav-right { display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap; }
+        .user-badge {
+            background: rgba(139, 92, 246, 0.06); padding: 0.25rem 0.8rem 0.25rem 0.25rem;
+            border-radius: 40px; display: flex; align-items: center; gap: 10px;
+            font-weight: 600; font-size: 0.85rem; border: 1px solid rgba(139, 92, 246, 0.08);
+            cursor: pointer; transition: var(--transition);
+        }
+        .user-badge:hover { border-color: var(--primary); background: rgba(139, 92, 246, 0.12); }
+        .user-badge img { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--primary); object-fit: cover; }
+        .user-badge i { color: var(--text-muted); font-size: 2rem; }
+        .user-badge .username { max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .credits-badge {
+            background: rgba(139, 92, 246, 0.1); padding: 0.4rem 1.2rem; border-radius: 40px;
+            font-weight: 700; font-size: 0.85rem; border: 1px solid rgba(139, 92, 246, 0.12);
+            display: flex; align-items: center; gap: 8px; color: var(--primary-light);
+        }
+        .logout-btn {
+            background: transparent; border: 1px solid rgba(255, 255, 255, 0.04);
+            color: var(--text-muted); padding: 0.4rem 1.2rem; border-radius: 40px;
+            font-weight: 500; font-size: 0.75rem; cursor: pointer; transition: var(--transition);
+            font-family: 'Inter', sans-serif;
+        }
+        .logout-btn:hover { background: rgba(239, 68, 68, 0.08); border-color: rgba(239, 68, 68, 0.2); color: #f87171; }
+
+        .hero { text-align: center; padding: 0.5rem 0 2rem; }
+        .hero h1 {
+            font-family: 'Lilita One', cursive; font-size: 3.2rem;
+            background: linear-gradient(135deg, #fff 20%, #a78bfa 50%, #8b5cf6 80%);
+            background-size: 300% 300%; -webkit-background-clip: text; background-clip: text;
+            color: transparent; animation: gradientMove 5s ease infinite;
+        }
+        .hero .sub { font-size: 1.1rem; color: var(--text-secondary); border-left: 3px solid var(--primary); padding-left: 1rem; display: inline-block; }
+
+        .search-bar {
+            display: flex; flex-wrap: wrap; gap: 0.8rem; align-items: center;
+            padding: 0.4rem 0.4rem 0.4rem 1.5rem; border-radius: 60px; margin-bottom: 2.2rem;
+            background: rgba(10, 6, 24, 0.6); backdrop-filter: blur(12px);
+            border: 1px solid rgba(139, 92, 246, 0.06);
+        }
+        .search-bar:focus-within { border-color: rgba(139, 92, 246, 0.2); }
+        .search-bar i { color: var(--text-muted); }
+        .search-bar input {
+            flex: 1; background: transparent; border: none; padding: 0.8rem 0.2rem;
+            font-family: 'Inter', sans-serif; font-size: 0.95rem; color: var(--text-primary);
+            outline: none; min-width: 140px;
+        }
+        .search-bar input::placeholder { color: var(--text-muted); }
+        .filter-tabs { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-left: auto; }
+        .filter-tabs span {
+            background: rgba(139, 92, 246, 0.04); padding: 0.4rem 1.2rem; border-radius: 40px;
+            font-size: 0.78rem; font-weight: 600; color: var(--text-secondary);
+            cursor: pointer; transition: var(--transition); border: 1px solid transparent;
+        }
+        .filter-tabs span:hover { background: rgba(139, 92, 246, 0.08); color: var(--text-primary); }
+        .filter-tabs span.active {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #fff; border-color: var(--primary); box-shadow: 0 4px 16px rgba(139, 92, 246, 0.25);
+        }
+
+        .product-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 1.8rem; margin: 2.2rem 0 2.8rem;
+        }
+        .product-card {
+            background: rgba(20, 12, 48, 0.7); backdrop-filter: blur(12px);
+            border: 1px solid rgba(139, 92, 246, 0.06); border-radius: var(--radius);
+            padding: 1.8rem 1.2rem 1.6rem; transition: var(--transition);
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+            display: flex; flex-direction: column; align-items: center; text-align: center;
+            position: relative; overflow: hidden;
+        }
+        .product-card::before {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle at center, rgba(139, 92, 246, 0.03), transparent 70%);
+            opacity: 0; transition: var(--transition); pointer-events: none;
+        }
+        .product-card:hover::before { opacity: 1; }
+        .product-card:hover { transform: translateY(-6px); border-color: rgba(139, 92, 246, 0.15); box-shadow: 0 12px 48px rgba(139, 92, 246, 0.1); }
+        .product-card:hover .product-icon { background: rgba(139, 92, 246, 0.15); border-color: var(--primary); }
+        .product-icon {
+            font-size: 2.6rem; background: rgba(139, 92, 246, 0.06); width: 72px; height: 72px;
+            display: flex; align-items: center; justify-content: center; border-radius: 50%;
+            margin-bottom: 0.8rem; border: 1px solid rgba(139, 92, 246, 0.06);
+            color: var(--primary-light); transition: var(--transition);
+        }
+        .product-name { font-family: 'Lilita One', cursive; font-size: 1.2rem; margin-bottom: 0.1rem; color: var(--text-primary); }
+        .product-sub { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.4rem; font-weight: 600; }
+        .product-price { font-weight: 800; font-size: 1.4rem; color: var(--primary-light); margin: 0.2rem 0 0.8rem; }
+        .product-price small { font-weight: 400; font-size: 0.7rem; color: var(--text-muted); margin-left: 4px; }
+
+        .buy-btn-card {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border: none; border-radius: 60px; padding: 0.6rem 2rem;
+            font-weight: 700; font-size: 0.9rem; color: #fff;
+            font-family: 'Inter', sans-serif; cursor: pointer; transition: var(--transition);
+            width: 100%; max-width: 160px; box-shadow: 0 4px 20px rgba(139, 92, 246, 0.15);
+            position: relative; overflow: hidden;
+        }
+        .buy-btn-card:hover { transform: scale(1.03); box-shadow: 0 8px 32px rgba(139, 92, 246, 0.3); }
+        .buy-btn-card:active { transform: scale(0.96); }
+        .buy-btn-card:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+        .buy-btn-card.owned { background: linear-gradient(135deg, #34d399, #10b981); }
+        .buy-btn-card.owned:hover { box-shadow: 0 8px 32px rgba(52, 211, 153, 0.3); }
+
+        .disclaimer-global {
+            background: rgba(139, 92, 246, 0.03); border: 1px solid rgba(139, 92, 246, 0.06);
+            border-radius: var(--radius); padding: 1.4rem 2rem; margin: 2rem 0 1.5rem;
+            display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+            gap: 1rem; backdrop-filter: blur(8px);
+        }
+        .disclaimer-global:hover { border-color: rgba(139, 92, 246, 0.1); }
+        .disclaimer-global .msg { display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap; }
+        .disclaimer-global .msg i { color: var(--primary-light); font-size: 1.2rem; }
+        .disclaimer-global .msg span { font-weight: 500; color: var(--text-secondary); font-size: 0.9rem; }
+        .disclaimer-global .msg strong { color: var(--primary-light); font-weight: 600; }
+        .disclaimer-global .badge-ticket {
+            background: rgba(139, 92, 246, 0.06); padding: 0.4rem 1.4rem; border-radius: 40px;
+            font-size: 0.8rem; font-weight: 600; color: var(--primary-light);
+            border: 1px solid rgba(139, 92, 246, 0.08); display: flex; align-items: center; gap: 6px;
+        }
+
+        .page { display: none; }
+        .page.active { display: block; animation: fadeUp 0.4s ease; }
+
+        .orders-container {
+            display: grid; grid-template-columns: 1fr; gap: 1.2rem; margin: 1.5rem 0;
+        }
+        .order-card {
+            background: rgba(20, 12, 48, 0.7); backdrop-filter: blur(12px);
+            border: 1px solid rgba(139, 92, 246, 0.06); border-radius: var(--radius-sm);
+            padding: 1.2rem 1.5rem; display: flex; flex-wrap: wrap;
+            align-items: center; justify-content: space-between; gap: 1rem;
+            transition: var(--transition);
+        }
+        .order-card:hover { border-color: rgba(139, 92, 246, 0.12); }
+        .order-info { display: flex; align-items: center; gap: 1rem; }
+        .order-info img { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--primary); }
+        .order-details .order-pass { font-weight: 600; color: var(--text-primary); }
+        .order-details .order-user { font-size: 0.8rem; color: var(--text-secondary); }
+        .order-details .order-date { font-size: 0.7rem; color: var(--text-muted); }
+        .order-details .order-custom { font-size: 0.8rem; color: var(--primary-light); background: rgba(139, 92, 246, 0.06); padding: 0.2rem 0.8rem; border-radius: 40px; display: inline-block; margin-top: 0.2rem; }
+
+        .order-status {
+            padding: 0.3rem 1.2rem; border-radius: 40px; font-size: 0.75rem; font-weight: 600;
+        }
+        .order-status.pending { background: rgba(251, 191, 36, 0.1); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.15); }
+        .order-status.completed { background: rgba(52, 211, 153, 0.1); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.15); }
+
+        .order-actions { display: flex; gap: 0.5rem; }
+        .accept-btn {
+            background: linear-gradient(135deg, #34d399, #10b981); border: none; border-radius: 40px;
+            padding: 0.4rem 1.2rem; font-weight: 600; font-size: 0.75rem; color: #fff;
+            cursor: pointer; transition: var(--transition); font-family: 'Inter', sans-serif;
+        }
+        .accept-btn:hover { transform: scale(1.05); box-shadow: 0 4px 16px rgba(52, 211, 153, 0.3); }
+
+        .empty-orders { text-align: center; padding: 3rem; color: var(--text-muted); }
+        .empty-orders i { font-size: 3rem; margin-bottom: 1rem; color: var(--text-secondary); }
+
+        .profile-container {
+            background: rgba(20, 12, 48, 0.7); backdrop-filter: blur(16px);
+            border: 1px solid rgba(139, 92, 246, 0.06); border-radius: var(--radius);
+            padding: 2.5rem; max-width: 520px; margin: 1.5rem auto; text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+        }
+        .profile-container:hover { border-color: rgba(139, 92, 246, 0.1); }
+        .profile-avatar {
+            width: 120px; height: 120px; border-radius: 50%; border: 4px solid var(--primary);
+            object-fit: cover; margin-bottom: 1rem; background: var(--bg-dark);
+            box-shadow: 0 0 40px rgba(139, 92, 246, 0.1);
+        }
+        .profile-name { font-family: 'Lilita One', cursive; font-size: 2rem; color: var(--text-primary); margin-bottom: 0.1rem; }
+        .profile-username { font-size: 1rem; color: var(--text-secondary); margin-bottom: 0.3rem; }
+        .profile-id { font-size: 0.75rem; color: var(--text-muted); background: rgba(139, 92, 246, 0.04); padding: 0.2rem 1rem; border-radius: 40px; display: inline-block; margin-bottom: 0.8rem; border: 1px solid rgba(139, 92, 246, 0.04); }
+        .profile-email { font-size: 0.85rem; color: var(--text-secondary); background: rgba(139, 92, 246, 0.04); padding: 0.4rem 1.2rem; border-radius: 40px; display: inline-block; margin-bottom: 1rem; border: 1px solid rgba(139, 92, 246, 0.04); }
+        .profile-badge { display: inline-block; background: rgba(139, 92, 246, 0.08); color: var(--primary-light); padding: 0.3rem 1.4rem; border-radius: 40px; font-size: 0.8rem; font-weight: 600; border: 1px solid rgba(139, 92, 246, 0.08); }
+        .profile-stats { display: flex; justify-content: center; gap: 3rem; margin: 1.5rem 0 0; padding-top: 1.5rem; border-top: 1px solid rgba(139, 92, 246, 0.04); }
+        .profile-stat .number { font-family: 'Lilita One', cursive; font-size: 1.8rem; color: var(--primary-light); }
+        .profile-stat .label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; font-weight: 600; }
+
+        .owner-panel {
+            background: rgba(20, 12, 48, 0.7); border-radius: var(--radius); padding: 1.5rem;
+            margin-bottom: 2rem; border: 1px solid rgba(139, 92, 246, 0.06);
+        }
+        .owner-panel h3 { font-family: 'Lilita One', cursive; margin-bottom: 1rem; color: var(--primary-light); }
+        .owner-panel .form-group { display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; }
+        .owner-panel select, .owner-panel input {
+            background: rgba(10, 6, 24, 0.6); border: 1px solid rgba(139, 92, 246, 0.1);
+            border-radius: 40px; padding: 0.6rem 1.2rem; color: var(--text-primary);
+            font-family: 'Inter', sans-serif; outline: none; flex: 1; min-width: 150px;
+        }
+        .owner-panel select option { background: var(--bg-dark); }
+        .btn-add-credits {
+            background: linear-gradient(135deg, #34d399, #10b981); border: none; border-radius: 40px;
+            padding: 0.6rem 1.5rem; font-weight: 600; color: #fff; cursor: pointer;
+            font-family: 'Inter', sans-serif; transition: var(--transition); white-space: nowrap;
+        }
+        .btn-add-credits:hover { transform: scale(1.03); box-shadow: 0 4px 16px rgba(52, 211, 153, 0.3); }
+
+        .roblox-section { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(139, 92, 246, 0.04); }
+        .roblox-section .label { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.5rem; }
+        .roblox-section .form-group { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; }
+        .roblox-section .form-group input {
+            background: rgba(10, 6, 24, 0.6); border: 1px solid rgba(139, 92, 246, 0.1);
+            border-radius: 40px; padding: 0.6rem 1.2rem; color: var(--text-primary);
+            font-family: 'Inter', sans-serif; outline: none; flex: 1; min-width: 150px;
+        }
+        .btn-link-roblox {
+            background: linear-gradient(135deg, #5865f2, #4752c4); border: none; border-radius: 40px;
+            padding: 0.6rem 1.5rem; font-weight: 600; color: #fff; cursor: pointer;
+            font-family: 'Inter', sans-serif; transition: var(--transition);
+        }
+        .btn-link-roblox:hover { transform: scale(1.03); }
+        .roblox-status { margin-top: 0.5rem; font-size: 0.8rem; color: var(--text-muted); }
+
+        /* MODALE DETTAGLI CUSTOM */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(20px);
+            display: none; align-items: center; justify-content: center;
+            z-index: 10001; padding: 1.5rem;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal-box {
+            background: rgba(20, 12, 48, 0.95); border: 1px solid rgba(139, 92, 246, 0.12);
+            border-radius: var(--radius); padding: 2.5rem; max-width: 500px; width: 100%;
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.8);
+        }
+        .modal-box h2 { font-family: 'Lilita One', cursive; color: var(--primary-light); margin-bottom: 0.5rem; font-size: 1.8rem; }
+        .modal-box p { color: var(--text-secondary); margin-bottom: 1.5rem; }
+        .modal-box label { display: block; font-weight: 600; color: var(--text-primary); margin-bottom: 0.3rem; }
+        .modal-box input, .modal-box textarea {
+            width: 100%; background: rgba(10, 6, 24, 0.6); border: 1px solid rgba(139, 92, 246, 0.1);
+            border-radius: var(--radius-sm); padding: 0.8rem 1.2rem; color: var(--text-primary);
+            font-family: 'Inter', sans-serif; outline: none; margin-bottom: 1rem;
+        }
+        .modal-box input:focus, .modal-box textarea:focus { border-color: var(--primary); }
+        .modal-box textarea { resize: vertical; min-height: 60px; }
+        .modal-actions { display: flex; gap: 0.8rem; justify-content: flex-end; }
+        .modal-actions button {
+            padding: 0.6rem 1.8rem; border-radius: 40px; font-weight: 600;
+            cursor: pointer; transition: var(--transition); font-family: 'Inter', sans-serif;
+            border: none;
+        }
+        .modal-actions .btn-confirm {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #fff; box-shadow: 0 4px 20px rgba(139, 92, 246, 0.2);
+        }
+        .modal-actions .btn-confirm:hover { transform: scale(1.03); }
+        .modal-actions .btn-cancel {
+            background: rgba(255, 255, 255, 0.04); color: var(--text-secondary);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .modal-actions .btn-cancel:hover { background: rgba(255, 255, 255, 0.08); }
+
+        .login-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(20px);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 10000; padding: 1.5rem; animation: fadeUp 0.4s ease;
+        }
+        .login-box {
+            background: rgba(20, 12, 48, 0.9); border: 1px solid rgba(139, 92, 246, 0.08);
+            border-radius: var(--radius); padding: 3.5rem 2.8rem; max-width: 460px; width: 100%;
+            text-align: center; box-shadow: 0 40px 80px rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+        }
+        .login-box .logo-icon { font-size: 4.5rem; color: var(--primary-light); margin-bottom: 0.5rem; }
+        .login-box h2 { font-family: 'Lilita One', cursive; font-size: 2.4rem; background: linear-gradient(135deg, #fff, #a78bfa); -webkit-background-clip: text; background-clip: text; color: transparent; margin-bottom: 0.3rem; }
+        .login-box p { color: var(--text-secondary); margin-bottom: 2rem; font-size: 0.95rem; }
+        .discord-login-btn {
+            background: #5865f2; border: none; border-radius: 60px; padding: 1rem 2.8rem;
+            font-weight: 700; font-size: 1.1rem; color: #fff; font-family: 'Inter', sans-serif;
+            cursor: pointer; transition: var(--transition); display: inline-flex;
+            align-items: center; gap: 12px; box-shadow: 0 8px 32px rgba(88, 101, 242, 0.25);
+        }
+        .discord-login-btn:hover { transform: scale(1.03); background: #6d7af5; box-shadow: 0 12px 40px rgba(88, 101, 242, 0.35); }
+        .discord-login-btn:active { transform: scale(0.97); }
+        .login-box .disclaimer-mini { margin-top: 1.5rem; font-size: 0.75rem; color: var(--text-muted); border-top: 1px solid rgba(255, 255, 255, 0.02); padding-top: 1.2rem; }
+        .login-box .disclaimer-mini i { color: var(--primary-light); }
+
+        .shop-content { display: none; }
+        .shop-content.visible { display: block; }
+
+        .toast-container {
+            position: fixed; bottom: 2rem; right: 2rem; z-index: 9999;
+            display: flex; flex-direction: column; gap: 0.5rem;
+        }
+        .toast {
+            background: rgba(20, 12, 48, 0.95); backdrop-filter: blur(20px);
+            border: 1px solid rgba(139, 92, 246, 0.1); border-radius: var(--radius-sm);
+            padding: 1rem 1.5rem; color: var(--text-primary); font-weight: 500;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5); animation: fadeUp 0.3s ease;
+            max-width: 400px; display: flex; align-items: center; gap: 0.8rem;
+        }
+        .toast.success { border-color: rgba(52, 211, 153, 0.2); }
+        .toast.success i { color: #34d399; }
+        .toast.error { border-color: rgba(239, 68, 68, 0.2); }
+        .toast.error i { color: #ef4444; }
+        .toast.info { border-color: rgba(139, 92, 246, 0.2); }
+        .toast.info i { color: var(--primary-light); }
+        .toast .toast-close {
+            background: none; border: none; color: var(--text-muted);
+            cursor: pointer; font-size: 1.2rem; padding: 0 0.2rem;
+            transition: var(--transition);
+        }
+        .toast .toast-close:hover { color: var(--text-primary); }
+
+        .footer-note { text-align: center; color: var(--text-muted); font-size: 0.75rem; border-top: 1px solid rgba(255, 255, 255, 0.02); padding-top: 1.5rem; margin-top: 1rem; }
+
+        @media (max-width: 820px) {
+            .app { padding: 1rem; }
+            .top-nav { flex-direction: column; gap: 0.8rem; border-radius: 32px; padding: 0.8rem 1.2rem; }
+            .nav-left { flex-wrap: wrap; gap: 1rem; justify-content: center; }
+            .nav-right { flex-wrap: wrap; justify-content: center; }
+            .filter-tabs { margin-left: 0; justify-content: center; width: 100%; }
+            .search-bar { flex-direction: column; align-items: stretch; border-radius: 32px; padding: 1rem; }
+            .search-bar input { width: 100%; }
+            .product-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 1rem; }
+            .hero h1 { font-size: 2.4rem; }
+            .login-box { padding: 2rem 1.5rem; }
+            .login-box h2 { font-size: 1.8rem; }
+        }
+        @media (max-width: 480px) {
+            .brand { font-size: 1.3rem; }
+            .nav-links span { font-size: 0.75rem; padding: 0.3rem 0.8rem; }
+            .product-grid { grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+            .product-card { padding: 1.2rem 0.8rem 1rem; }
+            .product-icon { width: 56px; height: 56px; font-size: 2rem; }
+            .product-name { font-size: 1rem; }
+            .user-badge .username { max-width: 60px; }
+            .credits-badge { padding: 0.3rem 0.8rem; font-size: 0.75rem; }
+            .order-card { flex-direction: column; align-items: stretch; }
+            .order-actions { justify-content: center; }
+            .owner-panel .form-group { flex-direction: column; }
+            .owner-panel select, .owner-panel input { width: 100%; }
+            .modal-box { padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+
+        <!-- LOGIN -->
+        <div class="login-overlay" id="loginOverlay">
+            <div class="login-box">
+                <div class="logo-icon"><i class="fas fa-crown"></i></div>
+                <h2>Streetz War</h2>
+                <p>Accedi con Discord per acquistare i pass esclusivi</p>
+                <button class="discord-login-btn" id="discordLoginBtn">
+                    <i class="fab fa-discord"></i> Accedi con Discord
+                </button>
+                <div class="disclaimer-mini">
+                    <i class="fas fa-shield-alt"></i> Autenticazione sicura tramite Discord
+                </div>
+            </div>
+        </div>
+
+        <!-- TOAST -->
+        <div class="toast-container" id="toastContainer"></div>
+
+        <!-- MODALE DETTAGLI CUSTOM -->
+        <div class="modal-overlay" id="customModal">
+            <div class="modal-box">
+                <h2 id="modalTitle">🎨 Personalizza</h2>
+                <p id="modalDescription">Inserisci i dettagli per il tuo acquisto personalizzato</p>
+                <label for="customInput">Dettagli:</label>
+                <input type="text" id="customInput" placeholder="Inserisci qui..." />
+                <div class="modal-actions">
+                    <button class="btn-cancel" onclick="closeCustomModal()">Annulla</button>
+                    <button class="btn-confirm" onclick="confirmCustomOrder()">Conferma Acquisto</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SHOP CONTENT -->
+        <div class="shop-content" id="shopContent">
+
+            <!-- NAV -->
+            <nav class="top-nav glass">
+                <div class="nav-left">
+                    <div class="brand" onclick="showPage('shop')">
+                        <i class="fas fa-crown"></i> Streetz War
+                    </div>
+                    <div class="nav-links">
+                        <span class="active" onclick="showPage('shop')" id="navShop">Shop</span>
+                        <span onclick="showPage('orders')" id="navOrders">📦 I miei ordini</span>
+                        <span onclick="showPage('profile')" id="navProfile">Profile</span>
+                        <span id="navOwnerOrders" style="display:none;" onclick="showPage('owner')">📋 Gestione</span>
+                    </div>
+                </div>
+                <div class="nav-right">
+                    <div class="user-badge" id="userBadge" onclick="showPage('profile')">
+                        <img id="userAvatar" src="" alt="Avatar" style="display: none;" />
+                        <i id="userIcon" class="fas fa-user-circle"></i>
+                        <span class="username" id="usernameDisplay">Utente</span>
+                    </div>
+                    <div class="credits-badge">
+                        <i class="fas fa-coins"></i> <span id="creditsDisplay">0</span>
+                    </div>
+                    <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                </div>
+            </nav>
+
+            <!-- SHOP -->
+            <div class="page active" id="pageShop">
+                <div class="hero">
+                    <h1>🎮 OFFICIAL SHOP</h1>
+                    <div class="sub">Pass esclusivi · Potenzia la tua esperienza</div>
+                </div>
+
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Cerca un pass..." id="searchInput" />
+                    <div class="filter-tabs">
+                        <span class="active" data-filter="all">Tutti</span>
+                        <span data-filter="weapons">Weapons</span>
+                        <span data-filter="turf">Turf</span>
+                        <span data-filter="cosmetics">Cosmetics</span>
+                    </div>
+                </div>
+
+                <div class="product-grid" id="productGrid">
+                    <!-- WEAPONS (SINGOLI - NON RIACQUISTABILI) -->
+                    <div class="product-card animate-in" data-category="weapons" data-single="true">
+                        <div class="product-icon"><i class="fas fa-gun"></i></div>
+                        <div class="product-name">Tec-9</div>
+                        <div class="product-sub">Weapon · acquisto singolo</div>
+                        <div class="product-price">15 <small>credits</small></div>
+                        <button class="buy-btn-card" data-pass="Tec-9" data-price="15" data-single="true">Acquista</button>
+                    </div>
+                    <div class="product-card animate-in" data-category="weapons" data-single="true">
+                        <div class="product-icon"><i class="fas fa-gun"></i></div>
+                        <div class="product-name">Glock 17 Switch</div>
+                        <div class="product-sub">Weapon · acquisto singolo</div>
+                        <div class="product-price">25 <small>credits</small></div>
+                        <button class="buy-btn-card" data-pass="Glock 17 Switch" data-price="25" data-single="true">Acquista</button>
+                    </div>
+                    <div class="product-card animate-in" data-category="weapons" data-single="true">
+                        <div class="product-icon"><i class="fas fa-gun"></i></div>
+                        <div class="product-name">Walther PPK</div>
+                        <div class="product-sub">Weapon · acquisto singolo</div>
+                        <div class="product-price">10 <small>credits</small></div>
+                        <button class="buy-btn-card" data-pass="Walther PPK" data-price="10" data-single="true">Acquista</button>
+                    </div>
+
+                    <!-- TURF -->
+                    <div class="product-card animate-in" data-category="turf">
+                        <div class="product-icon"><i class="fas fa-shield-alt"></i></div>
+                        <div class="product-name">Turf Shield</div>
+                        <div class="product-sub">Turf · pass</div>
+                        <div class="product-price">30 <small>credits</small></div>
+                        <button class="buy-btn-card" data-pass="Turf Shield" data-price="30">Acquista</button>
+                    </div>
+
+                    <!-- COSMETICS - SINGOLO -->
+                    <div class="product-card animate-in" data-category="cosmetics" data-single="true">
+                        <div class="product-icon"><i class="fas fa-user-astronaut"></i></div>
+                        <div class="product-name">Custom Avatar</div>
+                        <div class="product-sub">Cosmetics · acquisto singolo</div>
+                        <div class="product-price">50 <small>credits</small></div>
+                        <button class="buy-btn-card" data-pass="Custom Avatar" data-price="50" data-single="true">Acquista</button>
+                    </div>
+
+                    <!-- COSMETICS - CUSTOM (CON DETTAGLI) -->
+                    <div class="product-card animate-in" data-category="cosmetics" data-custom="true">
+                        <div class="product-icon"><i class="fas fa-level-up-alt"></i></div>
+                        <div class="product-name">Custom Level</div>
+                        <div class="product-sub">Cosmetics · personalizzabile</div>
+                        <div class="product-price">30 <small>credits</small></div>
+                        <button class="buy-btn-card" data-pass="Custom Level" data-price="30" data-custom="true">Acquista</button>
+                    </div>
+                    <div class="product-card animate-in" data-category="cosmetics" data-custom="true">
+                        <div class="product-icon"><i class="fas fa-pen-fancy"></i></div>
+                        <div class="product-name">Custom Name</div>
+                        <div class="product-sub">Cosmetics · personalizzabile</div>
+                        <div class="product-price">20 <small>credits</small></div>
+                        <button class="buy-btn-card" data-pass="Custom Name" data-price="20" data-custom="true">Acquista</button>
+                    </div>
+                    <div class="product-card animate-in" data-category="cosmetics" data-custom="true">
+                        <div class="product-icon"><i class="fas fa-smile"></i></div>
+                        <div class="product-name">Custom Emoji</div>
+                        <div class="product-sub">Cosmetics · personalizzabile</div>
+                        <div class="product-price">15 <small>credits</small></div>
+                        <button class="buy-btn-card" data-pass="Custom Emoji" data-price="15" data-custom="true">Acquista</button>
+                    </div>
+                </div>
+
+                <div class="disclaimer-global">
+                    <div class="msg">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span><strong>Info:</strong> Armi e Custom Avatar sono acquisti singoli (non riacquistabili). Custom Level, Name ed Emoji sono personalizzabili!</span>
+                    </div>
+                    <div class="badge-ticket">
+                        <i class="fas fa-ticket-alt"></i> Ticket obbligatorio
+                    </div>
+                </div>
+            </div>
+
+            <!-- ORDINI UTENTE -->
+            <div class="page" id="pageOrders">
+                <div class="hero">
+                    <h1>📦 I MIEI ORDINI</h1>
+                    <div class="sub">Stato dei tuoi acquisti</div>
+                </div>
+                <div id="userOrdersContainer"></div>
+            </div>
+
+            <!-- OWNER -->
+            <div class="page" id="pageOwner">
+                <div class="hero">
+                    <h1>📋 Gestione</h1>
+                    <div class="sub">Gestisci ordini e crediti</div>
+                </div>
+
+                <div class="owner-panel">
+                    <h3>💎 Aggiungi Crediti</h3>
+                    <div class="form-group">
+                        <select id="userSelect"><option value="">Seleziona utente...</option></select>
+                        <input type="number" id="creditAmount" placeholder="Quantità" min="1" />
+                        <input type="text" id="creditReason" placeholder="Motivo (es. acquisto)" />
+                        <button class="btn-add-credits" onclick="addCredits()">
+                            <i class="fas fa-plus"></i> Aggiungi
+                        </button>
+                    </div>
+                </div>
+
+                <div id="ownerOrdersContainer"></div>
+            </div>
+
+            <!-- PROFILO -->
+            <div class="page" id="pageProfile">
+                <div class="profile-container">
+                    <img class="profile-avatar" id="profileAvatar" src="" alt="Avatar" />
+                    <div class="profile-name" id="profileName">Nome Utente</div>
+                    <div class="profile-username" id="profileUsername">@username</div>
+                    <div class="profile-id" id="profileId">ID: 123456789</div>
+                    <div class="profile-email" id="profileEmail">📧 email@example.com</div>
+                    <div class="profile-badge">✅ Verificato con Discord</div>
+
+                    <div class="roblox-section">
+                        <div class="label">🎮 Collega il tuo account Roblox</div>
+                        <div class="form-group">
+                            <input type="text" id="robloxInput" placeholder="Il tuo username Roblox" />
+                            <button class="btn-link-roblox" onclick="linkRoblox()">
+                                <i class="fas fa-link"></i> Collega
+                            </button>
+                        </div>
+                        <div class="roblox-status" id="robloxStatus"></div>
+                    </div>
+
+                    <div class="profile-stats">
+                        <div class="profile-stat">
+                            <div class="number" id="profileCredits">0</div>
+                            <div class="label">Credits</div>
+                        </div>
+                        <div class="profile-stat">
+                            <div class="number" id="profilePurchases">0</div>
+                            <div class="label">Acquisti</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-note">
+                <i class="fas fa-lock" style="margin-right:6px;"></i> Acquisto sicuro · Tutti i pass sono ufficiali
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== VARIABILI =====
+        let currentUser = null;
+        let isOwner = false;
+        let pendingOrder = null;
+
+        // ===== TOAST =====
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            const icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle', info: 'fa-info-circle' };
+            toast.innerHTML = `
+                <i class="fas ${icons[type] || icons.info}"></i>
+                <span>${message}</span>
+                <button class="toast-close" onclick="this.parentElement.remove()">&times;</button>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => { if (toast.parentElement) toast.remove(); }, 5000);
+        }
+
+        // ===== NAVIGAZIONE =====
+        function showPage(page) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('page' + page.charAt(0).toUpperCase() + page.slice(1)).classList.add('active');
+            document.querySelectorAll('.nav-links span').forEach(link => {
+                link.classList.remove('active');
+                if (link.id === 'nav' + page.charAt(0).toUpperCase() + page.slice(1)) {
+                    link.classList.add('active');
+                }
+            });
+            if (page === 'orders') loadUserOrders();
+            if (page === 'owner') { loadOwnerOrders(); loadUsersList(); }
+        }
+
+        // ===== AUTENTICAZIONE =====
+        async function checkAuth() {
+            try {
+                const response = await fetch('/api/user', { credentials: 'include' });
+                const data = await response.json();
+
+                if (data.user) {
+                    currentUser = data.user;
+                    isOwner = data.user.isOwner || false;
+
+                    document.getElementById('loginOverlay').style.display = 'none';
+                    document.getElementById('shopContent').classList.add('visible');
+
+                    document.getElementById('usernameDisplay').textContent = data.user.username;
+                    document.getElementById('profileName').textContent = data.user.global_name || data.user.username;
+                    document.getElementById('profileUsername').textContent = '@' + data.user.username;
+                    document.getElementById('profileId').textContent = 'ID: ' + data.user.id;
+                    document.getElementById('profileEmail').textContent = '📧 ' + (data.user.email || 'Email non disponibile');
+                    document.getElementById('creditsDisplay').textContent = data.user.credits || 0;
+                    document.getElementById('profileCredits').textContent = data.user.credits || 0;
+
+                    if (data.user.robloxUsername) {
+                        document.getElementById('robloxStatus').textContent = '✅ Collegato a ' + data.user.robloxUsername;
+                        document.getElementById('robloxStatus').style.color = '#34d399';
+                    }
+
+                    const avatarImg = document.getElementById('userAvatar');
+                    const profileAvatar = document.getElementById('profileAvatar');
+                    const userIcon = document.getElementById('userIcon');
+
+                    if (data.user.avatar) {
+                        const avatarUrl = `https://cdn.discordapp.com/avatars/${data.user.id}/${data.user.avatar}.png?size=256`;
+                        avatarImg.src = avatarUrl;
+                        avatarImg.style.display = 'inline-block';
+                        userIcon.style.display = 'none';
+                        profileAvatar.src = avatarUrl;
+                    } else {
+                        avatarImg.style.display = 'none';
+                        userIcon.style.display = 'inline-block';
+                        profileAvatar.src = '';
+                    }
+
+                    if (isOwner) {
+                        document.getElementById('navOwnerOrders').style.display = 'inline-block';
+                    }
+
+                    // Controlla gli acquisti singoli
+                    checkSinglePurchases();
+
+                    loadUserOrders();
+                    if (isOwner) { loadOwnerOrders(); loadUsersList(); }
+
+                } else {
+                    document.getElementById('loginOverlay').style.display = 'flex';
+                    document.getElementById('shopContent').classList.remove('visible');
+                }
+            } catch (error) {
+                console.error('Errore:', error);
+            }
+        }
+
+        // ===== CONTROLLA ACQUISTI SINGOLI =====
+        function checkSinglePurchases() {
+            const purchasedItems = currentUser?.purchasedItems || [];
+            document.querySelectorAll('.buy-btn-card[data-single="true"]').forEach(btn => {
+                const passName = btn.getAttribute('data-pass');
+                if (purchasedItems.includes(passName)) {
+                    btn.disabled = true;
+                    btn.textContent = '✅ Posseduto';
+                    btn.classList.add('owned');
+                }
+            });
+        }
+
+        // ===== LOGIN/LOGOUT =====
+        document.getElementById('discordLoginBtn').addEventListener('click', () => {
+            window.location.href = '/auth/discord';
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            try {
+                await fetch('/api/logout', { credentials: 'include' });
+                window.location.reload();
+            } catch (error) { console.error(error); }
+        });
+
+        // ===== MODALE CUSTOM =====
+        function openCustomModal(passName, price) {
+            pendingOrder = { passName, price };
+            const titles = {
+                'Custom Level': '🎯 Personalizza il tuo Level',
+                'Custom Name': '✏️ Scegli il tuo Name',
+                'Custom Emoji': '😊 Scegli la tua Emoji'
+            };
+            const descriptions = {
+                'Custom Level': 'Inserisci il livello custom che vuoi (es. "Legend", "Master", ecc.)',
+                'Custom Name': 'Inserisci il nome custom che vuoi (es. "The King", "Shadow", ecc.)',
+                'Custom Emoji': 'Inserisci l\'emoji custom che vuoi (es. "🔥", "⭐", "👑", ecc.)'
+            };
+            document.getElementById('modalTitle').textContent = titles[passName] || '🎨 Personalizza';
+            document.getElementById('modalDescription').textContent = descriptions[passName] || 'Inserisci i dettagli per il tuo acquisto personalizzato';
+            document.getElementById('customInput').placeholder = `Inserisci il tuo ${passName.toLowerCase()}...`;
+            document.getElementById('customInput').value = '';
+            document.getElementById('customModal').classList.add('show');
+        }
+
+        function closeCustomModal() {
+            document.getElementById('customModal').classList.remove('show');
+            pendingOrder = null;
+        }
+
+        async function confirmCustomOrder() {
+            const customValue = document.getElementById('customInput').value.trim();
+            if (!customValue) {
+                showToast('❌ Inserisci i dettagli richiesti', 'error');
+                return;
+            }
+
+            const { passName, price } = pendingOrder;
+            await processOrder(passName, price, { details: customValue });
+            closeCustomModal();
+        }
+
+        // ===== PROCESSO ORDINE =====
+        async function processOrder(passName, price, customDetails = null) {
+            try {
+                const response = await fetch('/api/orders', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ passName, price, category: 'cosmetics', customDetails })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showToast(`✅ Ordine per ${passName} creato!`, 'success');
+                    document.getElementById('creditsDisplay').textContent = data.newCredits;
+                    document.getElementById('profileCredits').textContent = data.newCredits;
+                    
+                    // Aggiorna la lista acquisti singoli
+                    if (data.order && ['Tec-9', 'Glock 17 Switch', 'Walther PPK', 'Custom Avatar'].includes(passName)) {
+                        if (currentUser) {
+                            if (!currentUser.purchasedItems) currentUser.purchasedItems = [];
+                            currentUser.purchasedItems.push(passName);
+                            checkSinglePurchases();
+                        }
+                    }
+                    
+                    loadUserOrders();
+                    if (isOwner) loadOwnerOrders();
+                } else if (data.alreadyPurchased) {
+                    showToast('❌ Hai già acquistato questo item!', 'error');
+                } else {
+                    showToast('❌ ' + (data.error || 'Riprova'), 'error');
+                }
+            } catch (error) {
+                console.error('Errore acquisto:', error);
+                showToast('❌ Errore durante l\'acquisto', 'error');
+            }
+        }
+
+        // ===== ACQUISTO =====
+        document.querySelectorAll('.buy-btn-card').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                if (this.disabled) return;
+
+                const passName = this.getAttribute('data-pass');
+                const price = parseInt(this.getAttribute('data-price'));
+                const isCustom = this.getAttribute('data-custom') === 'true';
+                const isSingle = this.getAttribute('data-single') === 'true';
+
+                // Se è custom, apri il modale
+                if (isCustom) {
+                    openCustomModal(passName, price);
+                    return;
+                }
+
+                // Altrimenti acquisto diretto
+                if (!confirm(`🛒 Acquistare ${passName} (${price} credits)?`)) return;
+                processOrder(passName, price);
+            });
+        });
+
+        // ===== LINK ROBLOX =====
+        async function linkRoblox() {
+            const username = document.getElementById('robloxInput').value.trim();
+            if (!username) { showToast('❌ Inserisci un username Roblox', 'error'); return; }
+
+            try {
+                const response = await fetch('/api/roblox/link', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ robloxUsername: username })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    showToast(`✅ Account Roblox collegato: ${username}`, 'success');
+                    document.getElementById('robloxStatus').textContent = '✅ Collegato a ' + username;
+                    document.getElementById('robloxStatus').style.color = '#34d399';
+                    document.getElementById('robloxInput').value = '';
+                } else {
+                    showToast('❌ ' + (data.error || 'Riprova'), 'error');
+                }
+            } catch (error) {
+                console.error(error);
+                showToast('❌ Errore durante il collegamento', 'error');
+            }
+        }
+
+        // ===== AGGIUNGI CREDITI =====
+        async function addCredits() {
+            const userId = document.getElementById('userSelect').value;
+            const amount = parseInt(document.getElementById('creditAmount').value);
+            const reason = document.getElementById('creditReason').value || 'Aggiunta manuale';
+
+            if (!userId) { showToast('❌ Seleziona un utente', 'error'); return; }
+            if (!amount || amount <= 0) { showToast('❌ Inserisci un importo valido', 'error'); return; }
+
+            try {
+                const response = await fetch('/api/credits/add', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ userId, amount, reason })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    showToast(`✅ Aggiunti ${amount} crediti a ${data.user.username}`, 'success');
+                    document.getElementById('creditAmount').value = '';
+                    document.getElementById('creditReason').value = '';
+                    loadUsersList();
+                    loadOwnerOrders();
+                    if (currentUser && currentUser.id === userId) {
+                        currentUser.credits = data.newCredits;
+                        document.getElementById('creditsDisplay').textContent = data.newCredits;
+                        document.getElementById('profileCredits').textContent = data.newCredits;
+                    }
+                } else {
+                    showToast('❌ ' + (data.error || 'Riprova'), 'error');
+                }
+            } catch (error) {
+                console.error(error);
+                showToast('❌ Errore durante l\'aggiunta crediti', 'error');
+            }
+        }
+
+        // ===== CARICA ORDINI UTENTE =====
+        async function loadUserOrders() {
+            try {
+                const response = await fetch('/api/orders/my', { credentials: 'include' });
+                const data = await response.json();
+                const container = document.getElementById('userOrdersContainer');
+
+                if (!data.orders || data.orders.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-orders">
+                            <i class="fas fa-box-open"></i>
+                            <p>Nessun ordine effettuato</p>
+                            <p style="font-size:0.8rem;color:var(--text-muted);">Acquista un pass per vedere i tuoi ordini qui</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const orders = data.orders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                const completed = data.orders.filter(o => o.status === 'completed').length;
+                document.getElementById('profilePurchases').textContent = completed;
+
+                container.innerHTML = `
+                    <div class="orders-container">
+                        ${orders.map(order => `
+                            <div class="order-card">
+                                <div class="order-info">
+                                    <img src="https://cdn.discordapp.com/avatars/${order.userId}/${order.userAvatar}.png?size=64" alt="Avatar" />
+                                    <div class="order-details">
+                                        <div class="order-pass">${order.passName}</div>
+                                        <div class="order-user">${order.username} · ${order.price} credits</div>
+                                        ${order.robloxUsername ? `<div class="order-user">🎮 ${order.robloxUsername}</div>` : ''}
+                                        ${order.customDetails ? `<div class="order-custom">📝 ${order.customDetails.details || order.customDetails}</div>` : ''}
+                                        <div class="order-date">${new Date(order.createdAt).toLocaleDateString('it-IT')} ${new Date(order.createdAt).toLocaleTimeString('it-IT')}</div>
+                                    </div>
+                                </div>
+                                <div class="order-status ${order.status}">
+                                    ${order.status === 'pending' ? '⏳ In attesa' : '✅ Completato'}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+
+            } catch (error) {
+                console.error('Errore caricamento ordini:', error);
+            }
+        }
+
+        // ===== CARICA ORDINI OWNER =====
+        async function loadOwnerOrders() {
+            if (!isOwner) return;
+
+            try {
+                const response = await fetch('/api/orders/all', { credentials: 'include' });
+                const data = await response.json();
+                const container = document.getElementById('ownerOrdersContainer');
+
+                if (!data.orders || data.orders.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-orders">
+                            <i class="fas fa-box-open"></i>
+                            <p>Nessun ordine da gestire</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const orders = data.orders.sort((a, b) => {
+                    if (a.status === 'pending' && b.status !== 'pending') return -1;
+                    if (a.status !== 'pending' && b.status === 'pending') return 1;
+                    return new Date(b.createdAt) - new Date(a.createdAt);
+                });
+
+                container.innerHTML = `
+                    <div class="orders-container">
+                        ${orders.map(order => `
+                            <div class="order-card">
+                                <div class="order-info">
+                                    <img src="https://cdn.discordapp.com/avatars/${order.userId}/${order.userAvatar}.png?size=64" alt="Avatar" />
+                                    <div class="order-details">
+                                        <div class="order-pass">${order.passName}</div>
+                                        <div class="order-user">${order.username} · ${order.price} credits</div>
+                                        ${order.robloxUsername ? `<div class="order-user">🎮 ${order.robloxUsername}</div>` : ''}
+                                        ${order.customDetails ? `<div class="order-custom">📝 ${order.customDetails.details || order.customDetails}</div>` : ''}
+                                        <div class="order-date">${new Date(order.createdAt).toLocaleDateString('it-IT')} ${new Date(order.createdAt).toLocaleTimeString('it-IT')}</div>
+                                    </div>
+                                </div>
+                                <div class="order-status ${order.status}">
+                                    ${order.status === 'pending' ? '⏳ In attesa' : '✅ Completato'}
+                                </div>
+                                ${order.status === 'pending' ? `
+                                    <div class="order-actions">
+                                        <button class="accept-btn" onclick="acceptOrder('${order.id}')">
+                                            <i class="fas fa-check"></i> Accetta
+                                        </button>
+                                    </div>
+                                ` : `
+                                    <div style="font-size:0.7rem;color:var(--text-muted);">
+                                        Completato il ${order.completedAt ? new Date(order.completedAt).toLocaleDateString('it-IT') : '-'}
+                                    </div>
+                                `}
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+
+            } catch (error) {
+                console.error('Errore caricamento ordini owner:', error);
+            }
+        }
+
+        // ===== ACCETTA ORDINE =====
+        async function acceptOrder(orderId) {
+            if (!confirm('✅ Accettare questo ordine?')) return;
+
+            try {
+                const response = await fetch(`/api/orders/${orderId}/accept`, {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+                const data = await response.json();
+                if (data.success) {
+                    showToast('✅ Ordine accettato!', 'success');
+                    loadOwnerOrders();
+                    loadUserOrders();
+                } else {
+                    showToast('❌ ' + (data.error || 'Riprova'), 'error');
+                }
+            } catch (error) {
+                console.error('Errore accettazione ordine:', error);
+                showToast('❌ Errore durante l\'accettazione', 'error');
+            }
+        }
+
+        // ===== CARICA LISTA UTENTI =====
+        async function loadUsersList() {
+            try {
+                const response = await fetch('/api/users', { credentials: 'include' });
+                const data = await response.json();
+                const select = document.getElementById('userSelect');
+                select.innerHTML = '<option value="">Seleziona utente...</option>';
+                data.users.forEach(user => {
+                    const option = document.createElement('option');
+                    option.value = user.id;
+                    option.textContent = `${user.global_name || user.username} (${user.credits} credits)`;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Errore caricamento utenti:', error);
+            }
+        }
+
+        // ===== RICERCA E FILTRI =====
+        document.querySelectorAll('.filter-tabs span').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.filter-tabs span').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                filterProducts();
+            });
+        });
+
+        document.getElementById('searchInput').addEventListener('input', filterProducts);
+
+        function filterProducts() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const activeFilter = document.querySelector('.filter-tabs span.active');
+            const filter = activeFilter ? activeFilter.getAttribute('data-filter') : 'all';
+            
+            document.querySelectorAll('.product-card').forEach(card => {
+                const name = card.querySelector('.product-name').textContent.toLowerCase();
+                const category = card.getAttribute('data-category');
+                const matchesSearch = name.includes(searchTerm);
+                const matchesFilter = filter === 'all' || category === filter;
+                card.style.display = (matchesSearch && matchesFilter) ? 'flex' : 'none';
+            });
+        }
+
+        // ===== AVVIA =====
+        checkAuth();
+    </script>
+</body>
+</html>

@@ -1,0 +1,88 @@
+{
+  "users": {
+    "1490001912232149152": {
+      "id": "1490001912232149152",
+      "username": "laureato",
+      "global_name": "4",
+      "avatar": "cf1244071e79806947a80178614debef",
+      "email": "laureatox@proton.me",
+      "credits": 199840,
+      "robloxUsername": "Kajdsi8",
+      "customItems": [],
+      "joinedAt": "2026-07-29T14:19:06.132Z",
+      "purchasedItems": [
+        "Custom Avatar"
+      ]
+    }
+  },
+  "orders": [
+    {
+      "id": "ms668eskb1sf6",
+      "userId": "1490001912232149152",
+      "username": "laureato",
+      "userAvatar": "cf1244071e79806947a80178614debef",
+      "passName": "Custom Level",
+      "price": 30,
+      "category": "custom",
+      "status": "completed",
+      "createdAt": "2026-07-29T14:19:42.692Z",
+      "completedAt": "2026-07-29T14:19:52.742Z",
+      "robloxUsername": "Kajdsi8"
+    },
+    {
+      "id": "ms669kcl6i51v",
+      "userId": "1490001912232149152",
+      "username": "laureato",
+      "userAvatar": "cf1244071e79806947a80178614debef",
+      "passName": "Custom Avatar",
+      "price": 50,
+      "category": "custom",
+      "status": "completed",
+      "createdAt": "2026-07-29T14:20:36.549Z",
+      "completedAt": "2026-07-29T14:20:40.274Z",
+      "robloxUsername": "Kajdsi8"
+    },
+    {
+      "id": "ms66heqrtd710",
+      "userId": "1490001912232149152",
+      "username": "laureato",
+      "userAvatar": "cf1244071e79806947a80178614debef",
+      "passName": "Custom Level",
+      "price": 30,
+      "category": "cosmetics",
+      "status": "completed",
+      "createdAt": "2026-07-29T14:26:42.531Z",
+      "completedAt": "2026-07-29T14:27:09.567Z",
+      "robloxUsername": "Kajdsi8",
+      "customDetails": {
+        "details": "1111111111"
+      }
+    },
+    {
+      "id": "ms66hiih8jrtz",
+      "userId": "1490001912232149152",
+      "username": "laureato",
+      "userAvatar": "cf1244071e79806947a80178614debef",
+      "passName": "Custom Avatar",
+      "price": 50,
+      "category": "cosmetics",
+      "status": "completed",
+      "createdAt": "2026-07-29T14:26:47.417Z",
+      "completedAt": "2026-07-29T14:27:07.555Z",
+      "robloxUsername": "Kajdsi8",
+      "customDetails": null
+    }
+  ],
+  "creditTransactions": [
+    {
+      "id": "ms667wqjb60zd",
+      "userId": "1490001912232149152",
+      "username": "laureato",
+      "amount": 200000,
+      "reason": "Aggiunta manuale",
+      "type": "add",
+      "ownerId": "1490001912232149152",
+      "createdAt": "2026-07-29T14:19:19.291Z"
+    }
+  ]
+}
