@@ -19,10 +19,15 @@ console.log('======================');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// 🔥 DEBUG: Log di tutte le richieste
+app.use((req, res, next) => {
+    console.log('📨 Richiesta:', req.method, req.url);
+    next();
+});
+
 // CONFIGURAZIONE
 const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID;
 const DISCORD_CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET;
-// 🔥 MODIFICATO: URL FISSO DEL TUO SITO
 const DISCORD_REDIRECT_URI = 'https://shop3-tjty.onrender.com/auth/discord/callback';
 const SESSION_SECRET = process.env.SESSION_SECRET || 'una_chiave_super_sicura';
 
@@ -95,10 +100,13 @@ app.get('/auth/discord/callback', async (req, res) => {
     const { code } = req.query;
 
     if (!code) {
+        console.log('❌ Nessun codice ricevuto da Discord');
         return res.redirect('/?auth=error');
     }
 
     try {
+        console.log('🔄 Scambio del codice con token...');
+
         const tokenResponse = await axios.post('https://discord.com/api/oauth2/token',
             new URLSearchParams({
                 client_id: DISCORD_CLIENT_ID,
@@ -115,6 +123,7 @@ app.get('/auth/discord/callback', async (req, res) => {
         );
 
         const { access_token } = tokenResponse.data;
+        console.log('✅ Token ottenuto');
 
         const userResponse = await axios.get('https://discord.com/api/users/@me', {
             headers: {
@@ -123,6 +132,7 @@ app.get('/auth/discord/callback', async (req, res) => {
         });
 
         const userData = userResponse.data;
+        console.log('✅ Dati utente ottenuti:', userData.username);
 
         const OWNER_DISCORD_ID = '1490001912232149152';
         
@@ -141,6 +151,7 @@ app.get('/auth/discord/callback', async (req, res) => {
                 joinedAt: new Date().toISOString()
             };
             saveData(data);
+            console.log('✅ Nuovo utente creato:', userData.username);
         }
 
         req.session.user = {
@@ -158,11 +169,13 @@ app.get('/auth/discord/callback', async (req, res) => {
 
         console.log(`✅ Utente loggato: ${userData.username} (ID: ${userData.id})`);
         console.log(`👑 È owner? ${req.session.user.isOwner ? 'SÌ' : 'NO'}`);
+        console.log(`🔄 Reindirizzamento a: https://shop3-tjty.onrender.com`);
 
-        res.redirect('/?auth=success');
+        // 🔥 FIX: Reindirizzamento diretto all'URL del sito
+        res.redirect('https://shop3-tjty.onrender.com');
 
     } catch (error) {
-        console.error('Errore autenticazione:', error.response?.data || error.message);
+        console.error('❌ Errore autenticazione:', error.response?.data || error.message);
         res.redirect('/?auth=error');
     }
 });
@@ -170,6 +183,7 @@ app.get('/auth/discord/callback', async (req, res) => {
 // ===== ROTTE API =====
 
 app.get('/api/user', (req, res) => {
+    console.log('📨 /api/user chiamata, sessione:', req.session.user ? '✅ presente' : '❌ assente');
     if (req.session.user) {
         res.json({ user: req.session.user });
     } else {
